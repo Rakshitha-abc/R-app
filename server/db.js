@@ -26,7 +26,7 @@ async function initDB() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         description TEXT,
-        image_url TEXT,
+        image_url LONGTEXT,
         date TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -35,10 +35,18 @@ async function initDB() {
       CREATE TABLE IF NOT EXISTS memories (
         id INT AUTO_INCREMENT PRIMARY KEY,
         description TEXT,
-        image_url TEXT,
+        image_url LONGTEXT,
         created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    try {
+      await connection.query('ALTER TABLE diary MODIFY image_url LONGTEXT');
+      await connection.query('ALTER TABLE memories MODIFY image_url LONGTEXT');
+      console.log('Tables altered successfully for LONGTEXT');
+    } catch (err) {
+      console.log('Alter table skipped or failed: ' + err.message);
+    }
 
     connection.release();
     console.log('Tables verified and initialised');

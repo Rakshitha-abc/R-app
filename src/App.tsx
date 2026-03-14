@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Plus, X, Calendar, Lock, Upload, Loader2, LogOut } from 'lucide-react';
 import './App.css';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
 const ACCESS_CODE = import.meta.env.VITE_ACCESS_CODE || 'rakirakshu';
 
 interface DiaryEntry {

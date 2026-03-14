@@ -20,25 +20,18 @@ const PORT = process.env.PORT || 5000;
 initDB();
 
 // Multer Storage Configuration
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadPath = path.join(__dirname, 'public/uploads/');
-        cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 500 * 1024 * 1024 } // 500MB limit
+    limits: { fileSize: 4 * 1024 * 1024 } // 4MB limit to stay within Serverless execution limits
 });
 
 // Photo upload endpoint
 app.post('/api/upload', upload.single('photo'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    const url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    const base64Image = req.file.buffer.toString('base64');
+    const url = `data:${req.file.mimetype};base64,${base64Image}`;
     res.json({ url });
 });
 
@@ -102,6 +95,10 @@ app.post('/api/memories', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+module.exports = app;
