@@ -6,6 +6,7 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 const { pool, initDB } = require('./db');
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ limit: '500mb', extended: true }));
@@ -37,7 +38,7 @@ const upload = multer({
 // Photo upload endpoint
 app.post('/api/upload', upload.single('photo'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    const url = `http://localhost:${PORT}/uploads/${req.file.filename}`;
+    const url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
     res.json({ url });
 });
 
